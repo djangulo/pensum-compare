@@ -39,7 +39,7 @@ type server struct {
 }
 
 func newServer() *server {
-	fh, err := os.Open("pensums_unicaribe.csv")
+	fh, err := os.Open("pensum.csv")
 	if err != nil {
 		panic(err)
 	}
