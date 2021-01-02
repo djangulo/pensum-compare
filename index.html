@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lic. En Informática</title>
+  </head>
+  <body>
+    <h1>Licenciatura en informática</h1>
+    {{ if ne .Name ""}}
+      <h3>{{.Name}}</h3>
+    {{ end }}
+    <p>{{.Done}} / {{.Total}} cursadas - Restantes: {{Sub .Total .Done}} - Progreso: {{Percentage .Done .Total}}</p>
+    <form action="/" method="POST">
+      <input type="hidden" id="ids" name="ids" value="{{.IDs}}">
+      <input type="text" id="name" name="name" value="{{.Name}}">
+      <button type="submit">Compartir</button>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Código</th>
+          <th>Titulo</th>
+          <th>Créditos</th>
+          <th>PrerrequisitoID</th>
+          <th>Cuatrimestre</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range $i, $Rec := .Records}}
+        {{ if ne $i 0}}
+          {{with $subindex := Sub $i 1}}
+          {{ with $prev := index $.Records $subindex }}
+            {{ if ne $prev.Cuatrimestre $Rec.Cuatrimestre}}
+              <tr style="height: 15px;"></tr>
+            {{ end }}
+          {{end}}
+          {{end}}
+        {{end}}
+        <tr>
+          <td><input type="checkbox" name="{{$Rec.ID}}" id="{{$Rec.ID}}" onchange="toggleCheck(this, 'ids')" {{if (HasID $.Storage $Rec.ID)}}checked{{end}}></td>
+          <td>{{ $Rec.Codigo}}<a name="{{ $Rec.Codigo }}"></a></td>
+          <td>{{ $Rec.Titulo}}</td>
+          <td>{{ $Rec.Creditos}}</td>
+          <td>
+            {{ if $Rec.Prerrequisito }}
+            <a href="#{{ $Rec.Prerrequisito.Codigo }}" title="{{ $Rec.Prerrequisito.Titulo }}">
+              {{ $Rec.Prerrequisito.Codigo }}
+            </a>
+            {{ else }}
+              &mdash;
+            {{ end }}
+          </td>
+          <td>{{ $Rec.Cuatrimestre}}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    <script>
+      function addID(storeID, id) {
+        var el = document.getElementById(storeID);
+        var ids = el.value.split(",");
+        if (ids.indexOf(id) === -1) {
+          if (el.value === "") {
+            el.value = id;
+          } else {
+            el.value = ids.concat(id).join(",");
+          }
+        }
+      }
+
+      function removeID(storeID, id) {
+        var el = document.getElementById(storeID);
+        var ids = el.value.split(",");
+        if (ids.indexOf(id) !== -1) {
+          el.value = ids.filter((i) => i !== id).join(",");
+        }
+      }
+      function toggleCheck(chkBox, storageID) {
+        if (chkBox.checked) {
+          addID(storageID, chkBox.id);
+        } else {
+          removeID(storageID, chkBox.id);
+        }
+      }
+    </script>
+  </body>
+
+  <footer>
+    View source <a target="_blank" rel="noopener noreferrer" href="https://github.com/djangulo/pensum-compare">on github</a>.
+  </footer>
+
+</html>

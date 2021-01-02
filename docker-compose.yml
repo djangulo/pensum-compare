@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  pensum:
+    build:
+      context: $SERVICESDIR/pensum
+      dockerfile: $SERVICESDIR/pensum/Dockerfile
+    command: ["/app/pensum"]
+    ports:
+      - "51777:51777"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.port=443"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.pensum.middlewares=https-redirect"
+      - "traefik.http.routers.pensum.rule=Host(`pensum.djangulo.com`)"
+      - "traefik.http.routers.pensum.entrypoints=web"
+      - "traefik.http.routers.pensum-tls.rule=Host(`pensum.djangulo.com`)"
+      - "traefik.http.routers.pensum-tls.entrypoints=websecure"
+      - "traefik.http.routers.pensum-tls.tls=true"
+      - "traefik.http.routers.pensum-tls.tls.certresolver=leresolver"
